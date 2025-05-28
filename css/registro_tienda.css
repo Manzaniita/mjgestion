@@ -1,0 +1,294 @@
+/* css/registro_tienda.css */
+body.registro-ventas-page {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f7f9;
+    color: #333;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.btn-accion {
+    background-color: #2d7be5;
+    color: white;
+    padding: 8px 15px;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+    border: none;
+    cursor: pointer;
+    font-size: 0.9em;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+.btn-accion:hover {
+    background-color: #2563ba;
+}
+.btn-accion.editar {
+    background-color: #f39c12;
+}
+.btn-accion.editar:hover {
+    background-color: #d35400;
+}
+.btn-accion.eliminar {
+    background-color: #e74c3c;
+}
+.btn-accion.eliminar:hover {
+    background-color: #c0392b;
+}
+.btn-accion.editar-comision {
+    background-color: #ffc107;
+    color: #212529;
+    margin-top: 5px;
+}
+.btn-accion.editar-comision:hover {
+    background-color: #e0a800;
+}
+
+
+.container {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;
+}
+
+.mensaje {
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    font-weight: bold;
+}
+.mensaje.exito {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+.mensaje.error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.no-ventas {
+    text-align: center;
+    font-size: 1.2em;
+    color: #777;
+    padding: 30px;
+}
+
+.filtros-ventas {
+    background-color: #fff;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.filtros-ventas input[type="text"],
+.filtros-ventas select {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 0.95em;
+    flex-grow: 1;
+}
+.filtros-ventas select {
+    flex-grow: 0.5; /* Make select a bit smaller */
+}
+
+
+.ventas-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.venta-item {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    transition: box-shadow 0.3s ease;
+}
+.venta-item.resaltada {
+    box-shadow: 0 0 0 3px #2d7be5, 0 4px 12px rgba(45,123,229,0.3);
+    border-color: #2d7be5;
+}
+.venta-item.abierto {
+     box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+}
+
+
+.venta-sumario {
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+}
+.venta-item.abierto .venta-sumario {
+    border-bottom: 1px solid #2d7be5; /* Highlight when open */
+}
+
+
+.venta-sumario:hover {
+    background-color: #f9f9f9;
+}
+
+.sumario-info {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+.sumario-info .venta-id {
+    font-weight: bold;
+    color: #2d7be5;
+    font-size: 1.1em;
+}
+.sumario-info .fecha-venta,
+.sumario-info .cliente-nombre {
+    font-size: 0.9em;
+    color: #555;
+}
+.sumario-info .cliente-nombre {
+    font-weight: 600;
+}
+.sumario-info i {
+    margin-right: 5px;
+    color: #777;
+}
+.sumario-info .productos-sumario-lista {
+    color: #777;
+    font-style: italic;
+    max-width: 300px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.sumario-total-estado {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    text-align: right;
+}
+.sumario-total-estado .total-venta {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #333;
+}
+.sumario-total-estado .estado-venta {
+    font-size: 0.85em;
+    font-weight: bold;
+    padding: 4px 10px;
+    border-radius: 15px;
+    color: white;
+    min-width: 80px; /* Ensure consistent width */
+    text-align: center;
+}
+.estado-pendiente { background-color: #f39c12; }
+.estado-pagada { background-color: #2ecc71; }
+.estado-cancelada { background-color: #e74c3c; }
+.estado-enviada { background-color: #3498db; }
+.estado-completada { background-color: #1abc9c; }
+.estado-desconocido { background-color: #95a5a6; }
+
+
+.sumario-total-estado .toggle-icon {
+    font-size: 1.2em;
+    color: #2d7be5;
+    transition: transform 0.3s ease;
+}
+.venta-item.abierto .toggle-icon {
+    transform: rotate(180deg);
+}
+
+.venta-detalle-completo {
+    padding: 20px;
+    background-color: #fdfdfd;
+    border-top: 1px solid #eee;
+}
+.venta-detalle-completo h4 {
+    font-size: 1.1em;
+    color: #2d7be5;
+    margin-top: 15px;
+    margin-bottom: 10px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.venta-detalle-completo h4:first-child {
+    margin-top: 0;
+}
+.venta-detalle-completo p {
+    margin: 5px 0;
+    font-size: 0.95em;
+}
+
+.venta-detalle-completo table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 15px;
+    font-size: 0.9em;
+}
+.venta-detalle-completo th, 
+.venta-detalle-completo td {
+    padding: 8px 10px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+.venta-detalle-completo thead th {
+    background-color: #f0f4f7;
+    font-weight: bold;
+    color: #333;
+}
+.venta-detalle-completo tbody tr:hover {
+    background-color: #f9f9f9;
+}
+.venta-detalle-completo tfoot th,
+.venta-detalle-completo tfoot td {
+    font-weight: bold;
+    background-color: #f8f9fa;
+}
+.venta-detalle-completo table td small.text-muted {
+    font-size: 0.8em;
+    margin-top: 2px;
+}
+
+.venta-acciones {
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px dashed #ccc;
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.text-muted {
+    color: #6c757d !important;
+}
+.d-block {
+    display: block !important;
+}
+
+@media (max-width: 768px) {
+    .filtros-ventas {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .venta-sumario {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    .sumario-total-estado {
+        width: 100%;
+        justify-content: space-between;
+    }
+}

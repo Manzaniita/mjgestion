@@ -1,0 +1,299 @@
+/* Estilos generales para el módulo de compras - productos */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.header-section {
+    text-align: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--color-border-light);
+}
+
+.header-section h1 {
+    color: var(--color-primary);
+    font-size: 2.2rem;
+    margin-bottom: 5px;
+}
+
+.header-section .subtitle {
+    color: var(--color-text-secondary);
+    font-size: 1rem;
+}
+
+/* Dashboard Grid */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 25px;
+    margin-bottom: 30px;
+}
+
+.dashboard-card {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+}
+
+.wide-card {
+    grid-column: span 2;
+}
+
+.card-header {
+    background: var(--color-primary);
+    color: white;
+    padding: 15px 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.card-header h2 {
+    margin: 0;
+    font-size: 1.3rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.card-body {
+    padding: 20px;
+}
+
+/* Formularios */
+.form-elegant {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-row {
+    display: flex;
+    gap: 20px;
+}
+
+.form-row .form-group {
+    flex: 1;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.form-input {
+    width: 100%;
+    padding: 10px 15px;
+    border: 1px solid var(--color-border-light);
+    border-radius: 6px;
+    font-size: 0.95rem;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.form-input:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.1);
+    outline: none;
+}
+
+/* Botones */
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-primary {
+    background: var(--color-primary);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: var(--color-primary-dark);
+    transform: translateY(-2px);
+}
+
+.btn-success {
+    background: var(--color-success);
+    color: white;
+}
+
+.btn-success:hover {
+    background: var(--color-success-dark);
+    transform: translateY(-2px);
+}
+
+/* Alertas */
+.alert {
+    padding: 12px 15px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    font-size: 0.95rem;
+}
+
+.alert-success {
+    background: var(--color-success-light);
+    color: var(--color-success-dark);
+    border: 1px solid var(--color-success);
+}
+
+.alert-error {
+    background: var(--color-error-light);
+    color: var(--color-error-dark);
+    border: 1px solid var(--color-error);
+}
+
+/* Campos dinámicos */
+.section-divider {
+    position: relative;
+    margin: 25px 0;
+    text-align: center;
+}
+
+.section-divider span {
+    display: inline-block;
+    padding: 0 15px;
+    background: white;
+    position: relative;
+    z-index: 1;
+    color: var(--color-text-secondary);
+    font-size: 0.9rem;
+}
+
+.section-divider:before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: var(--color-border-light);
+    z-index: 0;
+}
+
+.campos-dinamicos {
+    margin-top: 20px;
+}
+
+.fields-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.field-item {
+    padding: 15px;
+    background: var(--color-bg-lighter);
+    border-radius: 8px;
+    border: 1px solid var(--color-border-light);
+    transition: all 0.3s ease;
+}
+
+.field-item:hover {
+    border-color: var(--color-primary-light);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+.field-type {
+    font-size: 0.8rem;
+    color: var(--color-text-secondary);
+    font-weight: normal;
+    margin-left: 5px;
+}
+
+.color-picker-container {
+    display: flex;
+    align-items: center;
+}
+
+.color-picker {
+    width: 40px;
+    height: 40px;
+    padding: 3px;
+    border-radius: 6px;
+    border: 1px solid var(--color-border-light);
+    cursor: pointer;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 30px;
+    color: var(--color-text-secondary);
+}
+
+.empty-state i {
+    font-size: 2rem;
+    margin-bottom: 10px;
+    color: var(--color-border-light);
+}
+
+.empty-state p {
+    margin: 0;
+}
+
+.form-actions {
+    margin-top: 25px;
+    text-align: right;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .wide-card {
+        grid-column: span 1;
+    }
+    
+    .form-row {
+        flex-direction: column;
+        gap: 15px;
+    }
+}
+
+/* Estilos específicos para el alta de productos */
+
+/* Campos dinámicos */
+.campos-dinamicos {
+    margin-top: 25px; 
+    border-top: 1px solid var(--color-border-light);
+    padding-top: 20px;
+}
+
+.campo-item {
+    margin-bottom: 20px; 
+    padding: 15px; 
+    background: var(--color-bg-lighter); 
+    border-radius: 6px; 
+    border: 1px solid var(--color-border-light);
+}
+
+/* Contenedor de opciones para selects */
+#opciones-container {
+    display: none;
+}

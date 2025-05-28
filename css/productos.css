@@ -1,0 +1,440 @@
+/* Estructura base mejorada */
+body.productos {
+    background-color: #f5f7fa;
+    color: #333;
+}
+
+/* Encabezado principal */
+.productos h1 {
+    border-bottom: 2px solid var(--color-primary);
+    padding-bottom: 15px;
+    margin-bottom: 30px;
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+/* Secciones de categoría */
+.categoria-section {
+    margin-bottom: 40px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.categoria-section:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 25px rgba(0,0,0,0.12);
+}
+
+.categoria-header {
+    background: linear-gradient(135deg, var(--color-primary), #4a6fa5);
+    color: white;
+    padding: 18px 25px;
+    font-size: 1.4em;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 500;
+}
+
+/* Contenedor de productos - modificado */
+.productos-container {
+    padding: 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* Ajusta 300px al ancho deseado */
+    gap: 20px;
+}
+
+/* Tarjetas de producto - modificado */
+.producto-card {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+    overflow: hidden;
+    border: 1px solid rgba(0,0,0,0.05);
+    /* Eliminamos el margin-bottom porque ahora lo controla el gap del grid */
+    width: 100%; /* Ocupa el espacio disponible en su celda del grid */
+    max-width: 100%; /* Evita que se salga del contenedor */
+}
+
+/* Ajustes para el contenido interno */
+.producto-header {
+    padding: 15px 20px;
+    background: #f8fafc;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.producto-header:hover {
+    background: #f1f5f9;
+}
+
+.producto-header h3 {
+    margin: 0;
+    color: #2c3e50;
+    font-size: 1.2em;
+    font-weight: 500;
+}
+
+.variantes-count {
+    background: var(--color-primary);
+    color: white;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.8em;
+    font-weight: 600;
+}
+
+/* Variantes */
+.variante {
+    padding: 20px;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    position: relative;
+    transition: background 0.2s ease;
+}
+
+.variante:last-child {
+    border-bottom: none;
+}
+
+.variante:hover {
+    background: #f8fafc;
+}
+
+.variante-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px dashed rgba(0,0,0,0.1);
+}
+
+.variante-id {
+    font-size: 0.8em;
+    color: #7f8c8d;
+    font-family: 'Courier New', monospace;
+}
+
+.fecha-creacion {
+    font-size: 0.75em;
+    color: #95a5a6;
+    font-style: italic;
+}
+
+/* Grid de datos */
+.datos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 15px;
+}
+
+.dato-item {
+    margin-bottom: 10px;
+}
+
+.dato-label {
+    font-weight: 600;
+    color: #7f8c8d;
+    margin-bottom: 5px;
+    font-size: 0.85em;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.dato-valor {
+    padding: 10px;
+    background: white;
+    border-radius: 6px;
+    border-left: 3px solid var(--color-primary);
+    font-size: 0.95em;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    word-break: break-word;
+}
+
+/* Contenedor principal de acciones */
+.acciones-container {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px dashed rgba(0,0,0,0.1);
+}
+
+/* Estilos para los formularios (contienen los botones) */
+.acciones-container .acciones-form {
+    margin: 0;
+    display: contents; /* Hace que el formulario no afecte el layout grid */
+}
+
+/* Estilos para los botones */
+.acciones-container .btn {
+    width: 100%;
+    padding: 8px 5px;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    font-size: 0.85em;
+}
+
+/* Elimina estilos antiguos de acciones-variante, acciones-botones y dato-item.acciones-container */
+.acciones-variante,
+.acciones-botones,
+.dato-item.acciones-container {
+    display: none !important;
+}
+
+/* Estado vacío */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    margin: 30px 0;
+}
+
+.empty-state p {
+    font-size: 1.2em;
+    color: #7f8c8d;
+    margin-bottom: 20px;
+}
+
+/* Botón de acción principal */
+.acciones {
+    margin-top: 40px;
+    text-align: center;
+}
+
+.acciones .btn {
+    padding: 12px 30px;
+    font-size: 1em;
+    font-weight: 500;
+    box-shadow: 0 2px 10px rgba(52, 152, 219, 0.3);
+}
+
+/* Efectos hover para botones */
+.btn-edit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(243, 156, 18, 0.3);
+}
+
+.btn-duplicate:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(46, 204, 113, 0.3);
+}
+
+.btn-delete:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(231, 76, 60, 0.3);
+}
+
+/* --- ESTILOS PARA EL MODAL --- */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1050;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: rgba(0,0,0,0.5);
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    width: 90%;
+    max-width: 700px;
+    display: flex;
+    flex-direction: column;
+    max-height: 90vh;
+    overflow: hidden;
+}
+
+.modal-header-bar {
+    padding: 15px 25px;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+}
+
+.modal-header-bar h2 {
+    margin: 0;
+    font-size: 1.3em;
+    color: #343a40;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.close-modal-btn {
+    color: #6c757d;
+    font-size: 1.8em;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 0 5px;
+    line-height: 1;
+    transition: color 0.2s ease;
+}
+.close-modal-btn:hover,
+.close-modal-btn:focus {
+    color: #000;
+    text-decoration: none;
+}
+
+.modal-body {
+    padding: 20px 25px;
+    overflow-y: auto;
+    flex-grow: 1;
+}
+
+.modal-body h4 {
+    font-size: 1.1em;
+    color: var(--color-primary, #2d7be5);
+    margin-top: 20px;
+    margin-bottom: 15px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #eee;
+}
+
+.campos-dinamicos-modal .form-group {
+    margin-bottom: 15px;
+}
+.campos-dinamicos-modal .form-group label {
+    font-weight: 500;
+    font-size: 0.9em;
+}
+.campos-dinamicos-modal .form-group .field-type {
+    font-size: 0.8em;
+    color: #6c757d;
+    margin-left: 5px;
+}
+.campos-dinamicos-modal .form-input,
+.campos-dinamicos-modal .form-input-color {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+    font-size: 0.95em;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+.campos-dinamicos-modal .form-input:focus {
+    border-color: var(--color-primary, #80bdff);
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(var(--color-primary-rgb, 0,123,255),.25);
+}
+.form-input-color {
+    height: 38px;
+    padding: 3px;
+}
+
+.modal-footer-bar {
+    padding: 15px 25px;
+    background-color: #f8f9fa;
+    border-top: 1px solid #dee2e6;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+}
+.modal-footer-bar .btn {
+    padding: 8px 20px;
+    font-size: 0.95em;
+    font-weight: 500;
+}
+.modal-footer-bar .btn-secondary {
+    background-color: #6c757d;
+    border-color: #6c757d;
+    color: white;
+}
+.modal-footer-bar .btn-secondary:hover {
+    background-color: #5a6268;
+    border-color: #545b62;
+}
+.modal-footer-bar .btn-success {
+    /* Ya deberías tener estilos para btn-success */
+}
+
+.modal-body .form-group {
+    margin-bottom: 18px;
+}
+.modal-body .form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+    color: #495057;
+}
+.modal-body .form-input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    font-size: 1em;
+    box-sizing: border-box;
+}
+.modal-body .form-input:focus {
+     border-color: var(--color-primary, #80bdff);
+     outline: 0;
+     box-shadow: 0 0 0 0.2rem rgba(var(--color-primary-rgb, 0,123,255),.25);
+}
+.modal-body select.form-input {
+    height: calc(2.25rem + 2px + 10px);
+}
+.modal-body small {
+    font-size: 0.85em;
+    color: #6c757d;
+    margin-top: 4px;
+    display: block;
+}
+
+/* Responsive para el modal */
+@media (max-width: 768px) {
+    .modal-content {
+        width: 95%;
+        max-height: 95vh;
+        margin: 10px auto;
+    }
+    .modal-header-bar h2 {
+        font-size: 1.1em;
+    }
+    .modal-body {
+        padding: 15px;
+    }
+    .modal-footer-bar {
+        padding: 10px 15px;
+        flex-direction: column-reverse;
+    }
+    .modal-footer-bar .btn {
+        width: 100%;
+        margin-bottom: 8px;
+    }
+    .modal-footer-bar .btn:last-child {
+        margin-bottom: 0;
+    }
+}
+
+/* Define la variable --color-primary-rgb si no la tienes */
+:root {
+    /* ... tus otras variables ... */
+    --color-primary-rgb: 45, 123, 229;
+}
