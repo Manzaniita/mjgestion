@@ -14,38 +14,58 @@ $total_comisiones_efectivas = 0; // Cambiado para reflejar la comisión final
 try {
     $stmt_ventas = $conn->prepare("
         SELECT 
-            vm.id AS venta_id, vm.fecha_venta, vm.total AS total_venta, 
-            vm.estado_pago, vm.estado_envio, vm.es_solicitud_reventa, vm.es_cancelada,
-            c.nombre AS cliente_nombre, u.nombre_completo AS usuario_nombre, u.username AS usuario_username
+            vm.id AS venta_id, 
+            vm.fecha_venta, 
+            vm.total AS total_venta_cobrado_al_revendedor, -- Alias descriptivo
+            vm.estado_pago, 
+            vm.estado_envio, 
+            vm.es_solicitud_reventa, 
+            vm.es_cancelada,
+            vm.comision_final_manual_admin, -- Para mostrar la comisión ajustada si existe
+            c.nombre AS cliente_nombre, 
+            c.red_social AS cliente_red_social
         FROM ventas_maestro vm
         JOIN clientes c ON vm.cliente_id = c.id
-        JOIN usuarios u ON vm.usuario_id = u.id
-        WHERE u.rol = 'reventa'
-          AND vm.es_cancelada = FALSE
-          AND (vm.es_solicitud_reventa = TRUE OR vm.estado_pago = :estado_pagado)
+        WHERE vm.usuario_id = :revendedor_id_logueado -- Filtrar por el ID del revendedor logueado
         ORDER BY vm.fecha_venta DESC
     ");
-    $stmt_ventas->bindValue(':estado_pagado', ESTADO_PAGO_PAGADO, PDO::PARAM_INT);
+    $stmt_ventas->bindParam(':revendedor_id_logueado', $revendedor_id, PDO::PARAM_INT);
     $stmt_ventas->execute();
     $maestros_venta = $stmt_ventas->fetchAll(PDO::FETCH_ASSOC);
 
-    $total_comisiones_efectivas = 0;
+    $total_monto_ventas_reventa = 0; // Reinicializar para este revendedor
+    $total_comisiones_efectivas = 0; // Reinicializar para este revendedor
+
     foreach ($maestros_venta as $key => $maestro) {
-        if ($maestro['es_solicitud_reventa']) {
+        // Generar estado display compuesto
+        if ($maestro['es_cancelada']) {
+            $estado_display = 'Cancelada';
+        } elseif ($maestro['es_solicitud_reventa']) {
             $estado_display = 'Solicitud Reventa';
-        } elseif ($maestro['estado_pago'] == ESTADO_PAGO_PAGADO) {
-            $estado_display = getNombreEstadoPago($maestro['estado_pago']) . ' / ' . getNombreEstadoEnvio($maestro['estado_envio']);
         } else {
-            $estado_display = getNombreEstadoPago($maestro['estado_pago']);
+            $estado_display = getNombreEstadoPago($maestro['estado_pago']) . ' / ' . getNombreEstadoEnvio($maestro['estado_envio']);
         }
         $maestros_venta[$key]['estado_display_compuesto'] = $estado_display;
 
-        // Sumar solo si pagada, no cancelada y comision > 0
-        $comision_efectiva_esta_venta = calcularComisionVenta($maestro['venta_id'], $conn);
+        // Acumular total vendido por el revendedor
+        $total_monto_ventas_reventa += $maestro['total_venta_cobrado_al_revendedor'];
+
+        // Calcular comisión
+        $comision_calculada_esta_venta = calcularComisionVenta($maestro['venta_id'], $conn);
+        
+        if ($maestro['comision_final_manual_admin'] !== null) {
+            $comision_efectiva_esta_venta = $maestro['comision_final_manual_admin'];
+            $maestros_venta[$key]['comision_fue_ajustada'] = true; 
+        } else {
+            $comision_efectiva_esta_venta = $comision_calculada_esta_venta;
+            $maestros_venta[$key]['comision_fue_ajustada'] = false;
+        }
+        $maestros_venta[$key]['comision_efectiva'] = $comision_efectiva_esta_venta;
+
+        // Sumar al total de comisiones solo si la venta está pagada y no cancelada
         if ($maestro['estado_pago'] == ESTADO_PAGO_PAGADO && !$maestro['es_cancelada'] && $comision_efectiva_esta_venta > 0) {
             $total_comisiones_efectivas += $comision_efectiva_esta_venta;
         }
-        $maestros_venta[$key]['comision_efectiva'] = $comision_efectiva_esta_venta;
     }
     $ventas_revendedor = $maestros_venta;
 
@@ -136,7 +156,7 @@ try {
                                     <?= htmlspecialchars($venta['estado_display_compuesto']) ?>
                                 </span>
                             </td>
-                            <td style="text-align:right;" class="total-col">ARS <?= number_format($venta['total_venta_cobrado_reventa'], 2) ?></td>
+                            <td style="text-align:right;" class="total-col">ARS <?= number_format($venta['total_venta_cobrado_al_revendedor'], 2) ?></td>
                             <td style="text-align:right;" class="comision-col">
                                 ARS <?= number_format($venta['comision_efectiva'], 2) ?>
                                 <?php if ($venta['comision_fue_ajustada']): ?>

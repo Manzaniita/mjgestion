@@ -14,25 +14,56 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $puedeGestionarSolicitudes) {
     // Aprobar solicitud de reventa
     if (isset($_POST['aprobar_solicitud_reventa'])) {
         $venta_id_aprobar = $_POST['venta_id'];
+        $nuevo_estado_pago = $_POST['nuevo_estado_pago_aprobacion'] ?? ESTADO_PAGO_FALTA_PAGAR;
+        $nuevo_estado_envio = $_POST['nuevo_estado_envio_aprobacion'] ?? ESTADO_ENVIO_PENDIENTE;
+
         try {
-            $stmt = $conn->prepare("UPDATE ventas_maestro 
+            // Obtener detalles para descontar stock
+            $stmt_detalles = $conn->prepare("SELECT producto_id, cantidad FROM ventas_detalle WHERE venta_id = ?");
+            $stmt_detalles->execute([$venta_id_aprobar]);
+            $detalles_para_descontar = $stmt_detalles->fetchAll(PDO::FETCH_ASSOC);
+
+            $conn->beginTransaction();
+
+            foreach ($detalles_para_descontar as $detalle) {
+                $stmt_check_stock = $conn->prepare("SELECT stock_disponible FROM productos WHERE id = ?");
+                $stmt_check_stock->execute([$detalle['producto_id']]);
+                $stock_actual_prod = $stmt_check_stock->fetchColumn();
+
+                if ($stock_actual_prod === false || $stock_actual_prod < $detalle['cantidad']) {
+                    throw new PDOException("No hay stock suficiente para el producto ID: " . $detalle['producto_id'] . ". Venta no aprobada.");
+                }
+
+                $stmt_stock = $conn->prepare("UPDATE productos SET stock_disponible = stock_disponible - ? WHERE id = ?");
+                $stmt_stock->execute([$detalle['cantidad'], $detalle['producto_id']]);
+            }
+
+            $stmt_update_venta = $conn->prepare("UPDATE ventas_maestro 
                                     SET es_solicitud_reventa = FALSE, 
-                                        estado_pago = :estado_pago_defecto 
+                                        estado_pago = :estado_pago_actualizado,
+                                        estado_envio = :estado_envio_actualizado
                                     WHERE id = :venta_id 
                                       AND es_solicitud_reventa = TRUE 
                                       AND es_cancelada = FALSE");
-            $stmt->bindValue(':estado_pago_defecto', ESTADO_PAGO_FALTA_PAGAR, PDO::PARAM_INT);
-            $stmt->bindValue(':venta_id', $venta_id_aprobar, PDO::PARAM_INT);
-            $stmt->execute();
+            $stmt_update_venta->bindValue(':estado_pago_actualizado', $nuevo_estado_pago, PDO::PARAM_INT);
+            $stmt_update_venta->bindValue(':estado_envio_actualizado', $nuevo_estado_envio, PDO::PARAM_INT);
+            $stmt_update_venta->bindValue(':venta_id', $venta_id_aprobar, PDO::PARAM_INT);
+            $stmt_update_venta->execute();
 
-            if ($stmt->rowCount() > 0) {
-                $mensaje = "Solicitud de reventa ID: $venta_id_aprobar aprobada.";
+            $conn->commit();
+
+            if ($stmt_update_venta->rowCount() > 0) {
+                $mensaje = "Solicitud de reventa ID: $venta_id_aprobar aprobada. Stock descontado. Estado Pago: " . getNombreEstadoPago($nuevo_estado_pago) . ", Estado Envío: " . getNombreEstadoEnvio($nuevo_estado_envio) . ".";
                 $tipo_mensaje = 'exito';
             } else {
-                $mensaje = "No se pudo aprobar la solicitud ID: $venta_id_aprobar.";
+                $conn->rollBack();
+                $mensaje = "No se pudo aprobar la solicitud ID: $venta_id_aprobar (quizás ya fue procesada o no cumple condiciones).";
                 $tipo_mensaje = 'error';
             }
         } catch (PDOException $e) {
+            if ($conn->inTransaction()) {
+                $conn->rollBack();
+            }
             $mensaje = "Error al aprobar solicitud: " . $e->getMessage();
             $tipo_mensaje = 'error';
         }
@@ -338,6 +369,7 @@ $venta_resaltada_id = $_GET['venta_id'] ?? null; // Para resaltar la última ven
             <div class="filtros-ventas">
                 <input type="text" id="filtro-nombre-cliente" placeholder="Buscar por cliente...">
                 <input type="text" id="filtro-id-venta" placeholder="Buscar por ID Venta...">
+                <!--
                 <select id="filtro-estado-venta">
                     <option value="">Todos los Estados</option>
                     <option value="0">Pendiente</option>
@@ -346,6 +378,7 @@ $venta_resaltada_id = $_GET['venta_id'] ?? null; // Para resaltar la última ven
                     <option value="3">Enviada</option>
                     <option value="4">Completada</option>
                 </select>
+                -->
             </div>
             <div class="ventas-lista">
                 <?php foreach ($ventas_completas as $venta): ?>
@@ -577,24 +610,24 @@ $venta_resaltada_id = $_GET['venta_id'] ?? null; // Para resaltar la última ven
 
         const filtroNombre = document.getElementById('filtro-nombre-cliente');
         const filtroId = document.getElementById('filtro-id-venta');
-        const filtroEstado = document.getElementById('filtro-estado-venta');
+        // const filtroEstado = document.getElementById('filtro-estado-venta');
         const ventasItems = document.querySelectorAll('.venta-item');
 
         function aplicarFiltros() {
             const nombreQuery = filtroNombre.value.toLowerCase();
             const idQuery = filtroId.value;
-            const estadoQuery = filtroEstado.value;
+            // const estadoQuery = filtroEstado.value;
 
             ventasItems.forEach(item => {
                 const nombreCliente = item.dataset.cliente;
                 const idVenta = item.dataset.idVenta;
-                const estadoVenta = item.dataset.estado;
+                // const estadoVenta = item.dataset.estado;
 
                 const matchNombre = nombreQuery === '' || nombreCliente.includes(nombreQuery);
                 const matchId = idQuery === '' || idVenta.includes(idQuery);
-                const matchEstado = estadoQuery === '' || estadoVenta === estadoQuery;
+                // const matchEstado = estadoQuery === '' || estadoVenta === estadoQuery;
                 
-                if (matchNombre && matchId && matchEstado) {
+                if (matchNombre && matchId /* && matchEstado */) {
                     item.style.display = '';
                 } else {
                     item.style.display = 'none';
@@ -604,8 +637,49 @@ $venta_resaltada_id = $_GET['venta_id'] ?? null; // Para resaltar la última ven
 
         filtroNombre.addEventListener('keyup', aplicarFiltros);
         filtroId.addEventListener('keyup', aplicarFiltros);
-        filtroEstado.addEventListener('change', aplicarFiltros);
+        // if (filtroEstado) filtroEstado.addEventListener('change', aplicarFiltros);
     });
     </script>
 </body>
 </html>
+
+<!-- Modal para aprobación de solicitud de reventa (nuevo) -->
+<div id="modal-aprobar-reventa" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="document.getElementById('modal-aprobar-reventa').style.display='none'">&times;</span>
+        <h2>Aprobar Solicitud de Reventa</h2>
+        <form method="post" action="">
+            <input type="hidden" name="venta_id" value="<?php echo htmlspecialchars($venta['venta_id']); ?>">
+            <label for="nuevo_estado_pago_aprobacion">Estado de Pago:</label>
+            <select name="nuevo_estado_pago_aprobacion" id="nuevo_estado_pago_aprobacion" required>
+                <option value="<?php echo ESTADO_PAGO_FALTA_PAGAR; ?>">Falta Pagar</option>
+                <option value="<?php echo ESTADO_PAGO_PAGADO; ?>">Pagado</option>
+                <!-- Agrega más opciones si tienes más estados -->
+            </select>
+            <label for="nuevo_estado_envio_aprobacion">Estado de Envío:</label>
+            <select name="nuevo_estado_envio_aprobacion" id="nuevo_estado_envio_aprobacion" required>
+                <option value="<?php echo ESTADO_ENVIO_PENDIENTE; ?>">Pendiente</option>
+                <option value="<?php echo ESTADO_ENVIO_EN_CAMINO; ?>">Enviado</option>
+                <option value="<?php echo ESTADO_ENVIO_ENTREGADO; ?>">Entregado</option>
+                <!-- Agrega más opciones si tienes más estados -->
+            </select>
+            <button type="submit" name="aprobar_solicitud_reventa">Aprobar Solicitud</button>
+        </form>
+    </div>
+</div>
+
+<script>
+// Mostrar modal de aprobación de reventa
+function mostrarModalAprobarReventa(ventaId) {
+    // Llenar datos en el modal si es necesario
+    document.getElementById('modal-aprobar-reventa').style.display = 'block';
+}
+
+// Cerrar modal al hacer clic fuera del contenido
+window.onclick = function(event) {
+    var modal = document.getElementById('modal-aprobar-reventa');
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
+}
+</script>

@@ -184,15 +184,6 @@ foreach($productos_db as &$prod_db_item){
 }
 unset($prod_db_item);
 
-$estados_venta_definidos = [
-    ESTADO_VENTA_PENDIENTE_PAGO => getNombreEstadoVenta(ESTADO_VENTA_PENDIENTE_PAGO),
-    ESTADO_VENTA_PAGADA => getNombreEstadoVenta(ESTADO_VENTA_PAGADA),
-    ESTADO_VENTA_CANCELADA => getNombreEstadoVenta(ESTADO_VENTA_CANCELADA),
-    ESTADO_VENTA_ENVIADA => getNombreEstadoVenta(ESTADO_VENTA_ENVIADA),
-    ESTADO_VENTA_COMPLETADA => getNombreEstadoVenta(ESTADO_VENTA_COMPLETADA),
-    ESTADO_VENTA_SOLICITUD_REVENTA => getNombreEstadoVenta(ESTADO_VENTA_SOLICITUD_REVENTA),
-    ESTADO_VENTA_SOLICITUD_RECHAZADA => getNombreEstadoVenta(ESTADO_VENTA_SOLICITUD_RECHAZADA),
-];
 $estados_pago_definidos = [
     ESTADO_PAGO_FALTA_PAGAR => getNombreEstadoPago(ESTADO_PAGO_FALTA_PAGAR),
     ESTADO_PAGO_PAGADO => getNombreEstadoPago(ESTADO_PAGO_PAGADO),
@@ -297,11 +288,10 @@ $estados_envio_definidos = [
                         <div class="form-group">
                             <label for="estado_envio_venta">Estado de Envío:</label>
                             <select id="estado_envio_venta" name="estado_envio_venta" required <?= $venta['es_cancelada'] ? 'disabled' : '' ?>>
-                                <?php foreach ($estados_envio_definidos as $id_ee => $nombre_ee): ?>
-                                    <option value="<?= $id_ee ?>" <?= $venta['estado_envio'] == $id_ee ? 'selected' : '' ?>>
-                                        <?= htmlspecialchars($nombre_ee) ?>
-                                    </option>
-                                <?php endforeach; ?>
+                                <option value="<?= ESTADO_ENVIO_PENDIENTE ?>"><?= getNombreEstadoEnvio(ESTADO_ENVIO_PENDIENTE) ?></option>
+                                <option value="<?= ESTADO_ENVIO_RETIRA_PUNTO_ENCUENTRO ?>"><?= getNombreEstadoEnvio(ESTADO_ENVIO_RETIRA_PUNTO_ENCUENTRO) ?></option>
+                                <option value="<?= ESTADO_ENVIO_EN_CAMINO ?>"><?= getNombreEstadoEnvio(ESTADO_ENVIO_EN_CAMINO) ?></option>
+                                <option value="<?= ESTADO_ENVIO_ENTREGADO ?>"><?= getNombreEstadoEnvio(ESTADO_ENVIO_ENTREGADO) ?></option>
                             </select>
                         </div>
                     </div>
@@ -358,22 +348,47 @@ $estados_envio_definidos = [
                             <div class="form-group">
                                 <label>Método:</label>
                                 <select name="pagos[<?= $index_pago ?>][metodo]" class="metodo-pago-select" required <?= $venta['es_cancelada'] ? 'disabled' : '' ?>>
-                                    <?php foreach ($metodos_pago_definidos as $val_metodo => $nombre_metodo): ?>
-                                    <option value="<?= $val_metodo ?>" <?= $pago['metodo_pago'] == $val_metodo ? 'selected' : '' ?>><?= htmlspecialchars($nombre_metodo) ?></option>
+                                    <?php
+                                    $metodos_pago_definidos_local = [
+                                        'efectivo' => 'Efectivo',
+                                        'transferencia_joaco' => 'Transferencia Joaco',
+                                        'transferencia' => 'Transferencia Bancaria',
+                                        'mercado_pago' => 'Mercado Pago',
+                                        'otro' => 'Otro método'
+                                    ];
+                                    foreach ($metodos_pago_definidos_local as $val_metodo => $nombre_metodo): ?>
+                                    <option value="<?= $val_metodo ?>" <?= strtolower(trim($pago['metodo_pago'])) == $val_metodo ? 'selected' : '' ?>>
+                                        <?= htmlspecialchars($nombre_metodo) ?>
+                                    </option>
                                     <?php endforeach; ?>
                                 </select>
                             </div>
-                             <div class="form-group pago-personalizado-container" style="<?= $pago['metodo_pago'] == 'otro' ? '' : 'display:none;' ?>">
-                                <label>Especificar Otro:</label>
-                                <input type="text" name="pagos[<?= $index_pago ?>][referencia]" class="pago-referencia" value="<?= $pago['metodo_pago'] == 'otro' ? htmlspecialchars($pago['referencia']) : '' ?>" placeholder="Especifique método">
+                            <?php
+                                $esMetodoPredefinido = array_key_exists(strtolower(trim($pago['metodo_pago'])), $metodos_pago_definidos_local);
+                                $esOtroMetodo = !$esMetodoPredefinido || strtolower(trim($pago['metodo_pago'])) == 'otro';
+                                $valorMetodoOtro = '';
+                                $valorReferencia = '';
+                                if ($esOtroMetodo && strtolower(trim($pago['metodo_pago'])) != 'otro') {
+                                    $valorMetodoOtro = htmlspecialchars($pago['metodo_pago']);
+                                    $valorReferencia = htmlspecialchars($pago['referencia']);
+                                } elseif (strtolower(trim($pago['metodo_pago'])) == 'otro') {
+                                    $valorMetodoOtro = htmlspecialchars($pago['referencia']);
+                                    $valorReferencia = '';
+                                } else {
+                                    $valorReferencia = htmlspecialchars($pago['referencia']);
+                                }
+                            ?>
+                            <div class="form-group pago-personalizado-container" style="<?= $esOtroMetodo ? '' : 'display:none;' ?>">
+                                <label>Especificar Otro Método:</label>
+                                <input type="text" name="pagos[<?= $index_pago ?>][metodo_otro_descripcion]" class="pago-metodo-otro-descripcion" value="<?= $valorMetodoOtro ?>" placeholder="Especifique método" <?= $esOtroMetodo ? '' : 'disabled' ?>>
+                            </div>
+                            <div class="form-group">
+                                <label>Referencia (Opcional):</label>
+                                <input type="text" name="pagos[<?= $index_pago ?>][referencia_pago]" class="pago-referencia-pago" value="<?= $valorReferencia ?>" placeholder="Ej: N° Op, CBU" <?= $venta['es_cancelada'] ? 'disabled' : '' ?>>
                             </div>
                             <div class="form-group">
                                 <label>Monto ARS:</label>
-                                <input type="number" step="0.01" name="pagos[<?= $index_pago ?>][monto]" class="monto-pago-input" value="<?= htmlspecialchars($pago['monto']) ?>" min="0.01" required>
-                            </div>
-                            <div class="form-group pago-referencia-container" style="<?= $pago['metodo_pago'] != 'otro' ? '' : 'display:none;' ?>">
-                                <label>Referencia (Opcional):</label>
-                                <input type="text" name="pagos[<?= $index_pago ?>][referencia_general]" class="pago-referencia-general" value="<?= $pago['metodo_pago'] != 'otro' ? htmlspecialchars($pago['referencia']) : '' ?>" placeholder="Ej: N° Op, CBU">
+                                <input type="number" step="0.01" name="pagos[<?= $index_pago ?>][monto]" class="monto-pago-input" value="<?= htmlspecialchars($pago['monto']) ?>" min="0.01" required <?= $venta['es_cancelada'] ? 'disabled' : '' ?>>
                             </div>
                             <div class="acciones-fila">
                                 <?php if (!$venta['es_cancelada']): ?>

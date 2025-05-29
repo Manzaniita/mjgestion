@@ -92,6 +92,7 @@ if ($esAdmin) {
     <link rel="stylesheet" href="css/global.css">
     <link rel="stylesheet" href="css/tienda.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
 </head>
 <body class="tienda">
     <div class="carrito-container" style="position:fixed;top:100px;left:20px;bottom:20px;width:370px;z-index:100;">
@@ -306,6 +307,7 @@ if ($esAdmin) {
         </div>
     </div>
 
+    <!-- Modal Finalizar Compra -->
     <div id="modalFinalizar" class="modal" style="display:none;">
         <div class="modal-overlay" style="position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.5);z-index:1001;"></div>
         <div class="modal-container" style="background:white;border-radius:12px;max-width:480px;width:95vw;padding:32px 28px 22px 28px;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1002;box-shadow:0 8px 32px rgba(0,0,0,0.18);">
@@ -327,7 +329,7 @@ if ($esAdmin) {
                 <form id="form-cliente-existente">
                     <div class="form-group" style="margin-bottom:14px;">
                         <label style="font-weight:600;"><i class="fas fa-user-tag"></i> Seleccionar Cliente:</label>
-                        <select name="cliente_id" style="width:100%;padding:7px 10px;border-radius:6px;border:1px solid #ddd;margin-top:4px;">
+                        <select name="cliente_id" id="cliente_id_existente_select" style="width:100%;padding:7px 10px;border-radius:6px;border:1px solid #ddd;margin-top:4px;">
                             <option value="">-- Venta como Invitado --</option>
                             <?php
                             // Si tienes un cliente "Invitado", puedes excluirlo aquí si lo deseas
@@ -488,6 +490,7 @@ if ($esAdmin) {
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
     <script>
     $(document).ready(function() {
         // Filtros de productos
@@ -768,6 +771,13 @@ if ($esAdmin) {
                 }
             });
         }
+
+        // Inicializar Select2 para el selector de clientes existentes
+        $('#cliente_id_existente_select').select2({
+            placeholder: "Buscar o seleccionar un cliente",
+            allowClear: true,
+            dropdownParent: $('#modalFinalizar')
+        });
     });
     </script>
 </body>

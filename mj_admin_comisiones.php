@@ -31,30 +31,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['actualizar_comision']
 // Obtener todas las ventas de revendedores que podrían generar comisión
 $ventas_revendedores = [];
 try {
+    // NUEVA CONSULTA: muestra TODAS las ventas de revendedores no canceladas
     $stmt_ventas = $conn->prepare("
         SELECT 
-            vm.id AS venta_id, vm.fecha_venta, vm.total AS total_venta, 
-            vm.estado_pago, vm.estado_envio, vm.es_solicitud_reventa, vm.es_cancelada,
-            c.nombre AS cliente_nombre, u.nombre_completo AS usuario_nombre, u.username AS usuario_username
+            vm.id AS venta_id, 
+            vm.fecha_venta, 
+            vm.total AS total_venta_cobrado_reventa, 
+            vm.estado_pago, 
+            vm.estado_envio, 
+            vm.es_solicitud_reventa, 
+            vm.es_cancelada,
+            vm.comision_final_manual_admin,
+            vm.comision_admin_notas,
+            c.nombre AS cliente_nombre, 
+            u.nombre_completo AS revendedor_nombre, 
+            u.username AS revendedor_username
         FROM ventas_maestro vm
         JOIN clientes c ON vm.cliente_id = c.id
         JOIN usuarios u ON vm.usuario_id = u.id
         WHERE u.rol = 'reventa'
           AND vm.es_cancelada = FALSE
-          AND (vm.es_solicitud_reventa = TRUE OR vm.estado_pago = :estado_pagado)
         ORDER BY vm.fecha_venta DESC
     ");
-    $stmt_ventas->bindValue(':estado_pagado', ESTADO_PAGO_PAGADO, PDO::PARAM_INT);
     $stmt_ventas->execute();
     $maestros_venta = $stmt_ventas->fetchAll(PDO::FETCH_ASSOC);
 
     foreach ($maestros_venta as $key => $maestro) {
-        if ($maestro['es_solicitud_reventa']) {
-            $estado_display = 'Solicitud Reventa';
-        } elseif ($maestro['estado_pago'] == ESTADO_PAGO_PAGADO) {
-            $estado_display = getNombreEstadoPago($maestro['estado_pago']) . ' / ' . getNombreEstadoEnvio($maestro['estado_envio']);
+        if ($maestro['es_cancelada']) {
+            $estado_display = 'Cancelada';
+        } elseif ($maestro['es_solicitud_reventa']) {
+            $estado_display = 'Solicitud Reventa (Pend. Aprobación)';
         } else {
-            $estado_display = getNombreEstadoPago($maestro['estado_pago']);
+            $estado_display = getNombreEstadoPago($maestro['estado_pago']) . ' / ' . getNombreEstadoEnvio($maestro['estado_envio']);
         }
         $maestros_venta[$key]['estado_display_compuesto'] = $estado_display;
         $maestros_venta[$key]['comision_calculada'] = calcularComisionVenta($maestro['venta_id'], $conn);
